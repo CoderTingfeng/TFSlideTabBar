@@ -13,6 +13,9 @@
 		843B5F491EB1E5C800C2AF70 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 843B5F471EB1E5C800C2AF70 /* Main.storyboard */; };
 		843B5F4B1EB1E5C800C2AF70 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 843B5F4A1EB1E5C800C2AF70 /* Assets.xcassets */; };
 		843B5F4E1EB1E5C800C2AF70 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 843B5F4C1EB1E5C800C2AF70 /* LaunchScreen.storyboard */; };
+		843B5F5A1EB1E5F200C2AF70 /* TFSlideTabBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 843B5F571EB1E5F200C2AF70 /* TFSlideTabBar.m */; };
+		843B5F5B1EB1E5F200C2AF70 /* TFSlideTabBarCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 843B5F591EB1E5F200C2AF70 /* TFSlideTabBarCollectionViewCell.m */; };
+		843B5F5E1EB1E61100C2AF70 /* TestViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 843B5F5C1EB1E61100C2AF70 /* TestViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +29,12 @@
 		843B5F4A1EB1E5C800C2AF70 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		843B5F4D1EB1E5C800C2AF70 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		843B5F4F1EB1E5C800C2AF70 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		843B5F561EB1E5F200C2AF70 /* TFSlideTabBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TFSlideTabBar.h; sourceTree = "<group>"; };
+		843B5F571EB1E5F200C2AF70 /* TFSlideTabBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TFSlideTabBar.m; sourceTree = "<group>"; };
+		843B5F581EB1E5F200C2AF70 /* TFSlideTabBarCollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TFSlideTabBarCollectionViewCell.h; sourceTree = "<group>"; };
+		843B5F591EB1E5F200C2AF70 /* TFSlideTabBarCollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TFSlideTabBarCollectionViewCell.m; sourceTree = "<group>"; };
+		843B5F5C1EB1E61100C2AF70 /* TestViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestViewController.m; sourceTree = "<group>"; };
+		843B5F5D1EB1E61100C2AF70 /* TestViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestViewController.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,10 +67,13 @@
 		843B5F3D1EB1E5C800C2AF70 /* TFSlideTabBarView */ = {
 			isa = PBXGroup;
 			children = (
+				843B5F551EB1E5F200C2AF70 /* TFSlideTabBar */,
 				843B5F411EB1E5C800C2AF70 /* AppDelegate.h */,
 				843B5F421EB1E5C800C2AF70 /* AppDelegate.m */,
 				843B5F441EB1E5C800C2AF70 /* ViewController.h */,
 				843B5F451EB1E5C800C2AF70 /* ViewController.m */,
+				843B5F5D1EB1E61100C2AF70 /* TestViewController.h */,
+				843B5F5C1EB1E61100C2AF70 /* TestViewController.m */,
 				843B5F471EB1E5C800C2AF70 /* Main.storyboard */,
 				843B5F4A1EB1E5C800C2AF70 /* Assets.xcassets */,
 				843B5F4C1EB1E5C800C2AF70 /* LaunchScreen.storyboard */,
@@ -77,6 +89,17 @@
 				843B5F3F1EB1E5C800C2AF70 /* main.m */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		843B5F551EB1E5F200C2AF70 /* TFSlideTabBar */ = {
+			isa = PBXGroup;
+			children = (
+				843B5F561EB1E5F200C2AF70 /* TFSlideTabBar.h */,
+				843B5F571EB1E5F200C2AF70 /* TFSlideTabBar.m */,
+				843B5F581EB1E5F200C2AF70 /* TFSlideTabBarCollectionViewCell.h */,
+				843B5F591EB1E5F200C2AF70 /* TFSlideTabBarCollectionViewCell.m */,
+			);
+			path = TFSlideTabBar;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -150,8 +173,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				843B5F5E1EB1E61100C2AF70 /* TestViewController.m in Sources */,
 				843B5F461EB1E5C800C2AF70 /* ViewController.m in Sources */,
+				843B5F5A1EB1E5F200C2AF70 /* TFSlideTabBar.m in Sources */,
 				843B5F431EB1E5C800C2AF70 /* AppDelegate.m in Sources */,
+				843B5F5B1EB1E5F200C2AF70 /* TFSlideTabBarCollectionViewCell.m in Sources */,
 				843B5F401EB1E5C800C2AF70 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
