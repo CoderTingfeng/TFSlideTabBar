@@ -159,6 +159,7 @@ static NSString * const cellID = @"TFSlideTabBarCollectionViewCell";
     cell.subViewController = self.subViewControllers[indexPath.row] ;
     
     return cell;
+    
 }
 
 
