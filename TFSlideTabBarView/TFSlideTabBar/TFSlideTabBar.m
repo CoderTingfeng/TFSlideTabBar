@@ -10,6 +10,11 @@
 #import "TFSlideTabBarCollectionViewCell.h"
 #define ScreenW [UIScreen mainScreen].bounds.size.width
 #define ScreenH [UIScreen mainScreen].bounds.size.height
+
+//RGB颜色
+#define RGBCOLOR(r,g,b) [UIColor colorWithRed:(r)/255.0f green:(g)/255.0f blue:(b)/255.0f alpha:1]
+#define RGBACOLOR(r,g,b,a) [UIColor colorWithRed:(r)/255.0f green:(g)/255.0f blue:(b)/255.0f alpha:(a)]
+
 //标题之间的间距
 static CGFloat const tabBarItemMargin = 15;
 //顶部标签条的高度
@@ -46,7 +51,17 @@ static NSString * const cellID = @"TFSlideTabBarCollectionViewCell";
 @property (nonatomic,assign) CGFloat  tabBarWidth;
 
 @property (nonatomic, assign) BOOL isAnimation;
+
+
+@property (nonatomic, weak) UIView *markView;
+@property (nonatomic, assign) BOOL isRecoverDirection; // 是否需要修正挪动方向
+@property (nonatomic, assign) BOOL isDragToLeft;    // 是否往左挪
+@property (nonatomic, assign) CGFloat lastOffsetX;  // 上一次的水平偏移量
+@property (nonatomic, assign) CGFloat currBtnX;
+@property (nonatomic, assign) CGFloat currBtnW;
+@property (nonatomic, assign) CGFloat currBtnCenterX;
 @end
+
 @implementation TFSlideTabBar
 
 - (NSMutableArray *)btnArray{
@@ -115,6 +130,14 @@ static NSString * const cellID = @"TFSlideTabBarCollectionViewCell";
     
     //注册cell
     [contentView registerClass:[TFSlideTabBarCollectionViewCell class] forCellWithReuseIdentifier:cellID];
+    
+    
+    UIView *markView = [[UIView alloc] init];
+    markView.backgroundColor = [UIColor greenColor];
+    markView.layer.masksToBounds = YES;
+    markView.layer.cornerRadius = 1;
+    [slideTabBar addSubview:markView];
+    self.markView = markView;
 }
 
 
@@ -132,9 +155,19 @@ static NSString * const cellID = @"TFSlideTabBarCollectionViewCell";
     CGFloat btnX = tabBarItemMargin;
     for (int i = 0 ; i < self.btnArray.count; i++) {
         
-        UIButton * btn = self.slideTabBar.subviews[i];
+        UIButton * btn = self.btnArray[i];
         btn.frame = CGRectMake(btnX, 0, btn.frame.size.width, btnH);
         btnX += btn.frame.size.width + tabBarItemMargin;
+        
+        
+        if (i == 0 && self.markView.frame.size.width == 0) {
+            CGRect frame = self.markView.frame;
+            frame.origin.x = btn.frame.origin.x;
+            frame.size.width = btn.frame.size.width;
+            frame.origin.y = tabBarHeight - 2;
+            frame.size.height = 2;
+            self.markView.frame = frame;
+        }
     }
     
     
@@ -159,24 +192,129 @@ static NSString * const cellID = @"TFSlideTabBarCollectionViewCell";
     cell.subViewController = self.subViewControllers[indexPath.row] ;
     
     return cell;
-    
 }
 
 
 /**
  UIScrollViewDelegate代理方法
  */
+
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
+    NSInteger index = scrollView.contentOffset.x / ScreenW;
+    
+    UIButton *btn = self.btnArray[index];
+    self.currBtnW = btn.frame.size.width;
+    self.currBtnX = btn.frame.origin.x;
+    self.currBtnCenterX = btn.frame.origin.x + btn.frame.size.width * 0.5;
+    self.isRecoverDirection = YES;
+}
+
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView{
-    
-    
     
     if (self.isAnimation) return;
     
-    CGFloat scale = scrollView.contentOffset.x / scrollView.frame.size.width;
-    //向右滑 leftIndex = 当前index 向左滑 leftIndex已经减1  rightIndex = 当前index
+    CGFloat offsetX = scrollView.contentOffset.x;
+    
+    CGFloat scale = offsetX / ScreenW;
+    
+    if (scale < 0 || scale > self.btnArray.count - 1) return;
+    
+    
+    UIButton *currBtn = self.btnArray[(NSInteger)scale];
+    CGFloat currCenterX = currBtn.frame.origin.x + currBtn.frame.size.width * 0.5;
+    
+    if ((self.isDragToLeft && currCenterX < self.currBtnCenterX) ||
+        (!self.isDragToLeft && currCenterX >= self.currBtnCenterX)) {
+        self.isRecoverDirection = YES;
+    }
+    
+    if (self.isRecoverDirection) {
+        self.isRecoverDirection = NO;
+        self.isDragToLeft = offsetX > self.lastOffsetX;
+    }
+    
+    self.lastOffsetX = offsetX; // 保存水平偏移量
+    
+    CGRect frame = self.markView.frame;
+    CGFloat h = frame.size.height;
+    CGFloat y = frame.origin.y;
+    CGFloat x;
+    CGFloat w;
+    
+    NSInteger targetIndex;
+    
+    if (self.isDragToLeft) {
+        targetIndex = (NSInteger)(scale + 1.0);
+    } else {
+        targetIndex = (NSInteger)(scale);
+    }
+    
+    if (targetIndex > self.btnArray.count - 1) {
+        targetIndex = self.btnArray.count - 1;
+    } else if (targetIndex < 0) {
+        targetIndex = 0;
+    }
+    
+    UIButton *btn = self.btnArray[targetIndex];
+    CGFloat targetW = btn.frame.size.width;
+    CGFloat targetX = btn.frame.origin.x;
+    CGFloat targetMaxX = targetX + targetW;
+    
+    if (self.isDragToLeft) {
+        
+        // 获取目标的左边下标
+        NSInteger lastIndex = targetIndex - 1;
+        if (lastIndex < 0) lastIndex = 0;
+        
+        UIButton *lastBtn = self.btnArray[lastIndex];
+        
+        // 前一个文字宽度
+        CGFloat lastW = lastBtn.frame.size.width;
+        
+        // 前一个文字X
+        CGFloat lastX = lastBtn.frame.origin.x;
+        // 前一个文字最大X
+        CGFloat lastMaxX = lastX + lastW;
+        
+        // 最终需要增加的W
+        CGFloat increaseW = targetMaxX - lastMaxX;
+        
+        w = (lastMaxX - self.currBtnX) + increaseW * (scale - lastIndex);
+        x = self.currBtnX;
+        
+    } else {
+        
+        // 获取目标下标的右边下标
+        NSInteger nextIndex = targetIndex + 1;
+        if (nextIndex > self.btnArray.count - 1) nextIndex = self.btnArray.count - 1;
+        
+        UIButton *nextBtn = self.btnArray[nextIndex];
+        
+        CGFloat nextW = nextBtn.frame.size.width;
+        CGFloat nextX = nextBtn.frame.origin.x;
+        
+        // 最终需要增加的W
+        CGFloat increaseW = (nextX - targetX) * (1 - (scale - targetIndex)); // 这里的scale需要取反，因为是反方向
+        
+        w = nextW + increaseW;
+        x = self.currBtnX - increaseW;
+        
+    }
+    
+    self.markView.frame = CGRectMake(x, y, w, h);
+    
+    NSLog(@"currCenterX -------- %lf", currCenterX);
+    NSLog(@"currTitleCenterX --- %lf", self.currBtnCenterX);
+    NSLog(@"isDragToLeft ------- %@", self.isDragToLeft ? @"往左挪":@"往右挪");
+    
+    
+    
+    
+    
     NSInteger leftIndex = scale;
     NSInteger rightIndex = leftIndex + 1;
-    if (scale < 0 || scale > self.btnArray.count - 1) return;
+    
+    
     
     // 获得需要操作的左边label
     UIButton *leftBtn = self.btnArray[leftIndex];
@@ -193,9 +331,10 @@ static NSString * const cellID = @"TFSlideTabBarCollectionViewCell";
     //    NSLog(@"rightScale -- %lf", rightScale);
     
     // 设置label的比例
+    
     /**
      * 0 - 0 = 0
-     * 0 - （-255） = 255
+     * 0 - 255 = -255
      * 0 - 0 = 0
      */
     
@@ -205,7 +344,7 @@ static NSString * const cellID = @"TFSlideTabBarCollectionViewCell";
     
     UIColor *leftColor = [UIColor colorWithRed:r/255.0 green:g/255.0 blue:b/255.0 alpha:1];
     
-    
+    //    NSLog(@"leftG --- %lf", g);
     
     [leftBtn setTitleColor:leftColor forState:UIControlStateNormal];
     
@@ -215,7 +354,7 @@ static NSString * const cellID = @"TFSlideTabBarCollectionViewCell";
     
     UIColor *rightColor = [UIColor colorWithRed:r/255.0 green:g/255.0 blue:b/255.0 alpha:1];
     
-    
+    //    NSLog(@"rightG --- %lf", g);
     
     [rightBtn setTitleColor:rightColor forState:UIControlStateNormal];
     
@@ -236,6 +375,22 @@ static NSString * const cellID = @"TFSlideTabBarCollectionViewCell";
     if(self.selectedIndex != (scrollView.contentOffset.x + ScreenW * 0.5) / ScreenW){
         self.selectedIndex = (scrollView.contentOffset.x + ScreenW * 0.5) / ScreenW;
     }
+    
+    
+    NSInteger index = scrollView.contentOffset.x / ScreenW;
+    
+    CGRect frame = self.markView.frame;
+    
+    CGFloat h = frame.size.height;
+    CGFloat y = frame.origin.y;
+    
+    UIButton *currBtn = self.btnArray[index];
+    CGFloat w = currBtn.frame.size.width;
+    CGFloat x = currBtn.frame.origin.x;
+    
+    [UIView animateWithDuration:0.3 delay:0 usingSpringWithDamping:0.7 initialSpringVelocity:0 options:0 animations:^{
+        self.markView.frame = CGRectMake(x, y, w, h);
+    } completion:nil];
 }
 
 - (void)setSelectedIndex:(NSInteger)selectedIndex {
@@ -280,7 +435,11 @@ static NSString * const cellID = @"TFSlideTabBarCollectionViewCell";
         if (self.tabBarWidth < self.bounds.size.width) {
             offsetX = 0;
         }
-        [self.slideTabBar setContentOffset:CGPointMake(offsetX, 0) animated:YES];
+        [self.slideTabBar setContentOffset:CGPointMake(offsetX, 0)];
+        
+        
+        self.markView.frame = CGRectMake(btn.frame.origin.x, self.markView.frame.origin.y, btn.frame.size.width, self.markView.frame.size.height);
+        
     } completion:^(BOOL finished) {
         self.isAnimation = NO;
     }];
@@ -324,7 +483,7 @@ static NSString * const cellID = @"TFSlideTabBarCollectionViewCell";
     self.tabBarWidth += btn.frame.size.width + tabBarItemMargin;
     btn.titleLabel.font = [UIFont systemFontOfSize:15];
     [btn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-    
+    //    [btn setTitleColor:[UIColor greenColor] forState:UIControlStateSelected];
 }
 
 @end

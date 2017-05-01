@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   #
 
   s.name         = "TFSlideTabBar"
-  s.version      = "0.0.1"
+  s.version      = "0.0.3"
   s.summary      = "滑动标签栏demo"
 
   # This description is used to generate tags and improve search results.
@@ -63,7 +63,7 @@ Pod::Spec.new do |s|
   #
 
   # s.platform     = :ios
-  # s.platform     = :ios, "5.0"
+ s.platform     = :ios, "8.0"
 
   #  When using multiple platforms
   # s.ios.deployment_target = "5.0"
@@ -89,7 +89,7 @@ Pod::Spec.new do |s|
   #  Not including the public_header_files will make all headers public.
   #
 
-  s.source_files  = "TFSlideTabBar", "TFSlideTabBar/**/*.{h,m}"
+  s.source_files  = "TFSlideTabBarView", "TFSlideTabBarView/TFSlideTabBar/*.{h,m}"
   s.exclude_files = "Classes/Exclude"
 
   # s.public_header_files = "Classes/**/*.h"
@@ -116,7 +116,7 @@ Pod::Spec.new do |s|
   #
 
   # s.framework  = "SomeFramework"
-  # s.frameworks = "SomeFramework", "AnotherFramework"
+  # s.frameworks = ['Foundation', 'UIKit', 'CoreGraphics', 'QuartzCore', 'CoreFoundation']
 
   # s.library   = "iconv"
   # s.libraries = "iconv", "xml2"
